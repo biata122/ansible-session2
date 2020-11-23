@@ -1,0 +1,37 @@
+---
+   - name: Ensure old versions of Docker are not installed.
+     apt:
+       name: "{{ old_ubuntu_packages }}"
+       state: absent
+   - name: APT - install system packages
+     apt:
+       name: "{{ apt_packages }}"
+       update_cache: yes
+   - name: Apt - add signing key, uses URL
+     apt_key:
+         url: "{{ docker_apt_gpg_key }}"
+         state: present
+   - name: Verifying the key with the fingerprint
+     command: apt-key fingerprint 0EBFCD88
+     register: fingerprint_check
+     changed_when: False
+     failed_when: "'9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88' not in fingerprint_check.stdout"
+   - name: Add Docker repo - ubuntu
+     apt_repository:
+      repo: "{{ ubuntu_repository }}"
+      state: present
+      update_cache: yes
+   - name: Install Docker packages
+     apt:
+      name: "{{ docker_packages }}"
+      state: latest
+      update_cache: yes
+     notify: restart docker
+   - name: Install Docker Module for Python
+     pip:
+      name: docker
+   - name: add users to docker group
+     user:
+      name: "{{ user_ubuntu }}"
+      groups: docker
+      append: yes

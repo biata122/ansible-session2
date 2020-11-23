@@ -1,0 +1,17 @@
+---
+   - name: Include docker-ubuntu task list
+     include_tasks: docker-ubuntu.yml
+     when: ansible_facts['distribution'] == "Ubuntu"
+   - name: Include docker-redhat task list
+     include_tasks: docker-redhat.yml
+     when: ansible_facts['distribution'] == "RedHat"
+   - name: restart docker
+     service:
+      name: docker
+      state: restarted
+   - name: run the nginx container
+     docker_container:
+      name: mynginx
+      image: nginx
+      ports: "8080:80"
+      

@@ -1,0 +1,6 @@
+---
+  - name: run docker on ubuntu and redhat
+    hosts: all
+    become: yes
+    roles: 
+     - docker
